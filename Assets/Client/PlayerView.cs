@@ -17,9 +17,6 @@ public class PlayerView : MonoBehaviour, ISyncEntity, IAutoCreateServerEntity
 
     [SerializeField] private RectTransform box;
 
-    [SerializeField] private float minFakeLag = 0;
-    [SerializeField] private float maxFakeLag = 0;
-
     string ISyncEntity.name => entityName;
 
     void ISyncEntity.ReceiveSync(int step, IState state_)
@@ -44,17 +41,11 @@ public class PlayerView : MonoBehaviour, ISyncEntity, IAutoCreateServerEntity
     }
 
     private void OnDodge() {
-        StartCoroutine(sendDelayed("dodge"));
+        clientSync.SendAction(this, "dodge");
     }
 
     private void OnSpell() {
-        StartCoroutine(sendDelayed("spell"));
-    }
-
-    IEnumerator sendDelayed(string action) {
-        var lag = Random.Range(minFakeLag, maxFakeLag);
-        yield return new WaitForSecondsRealtime(lag);
-        clientSync.SendAction(this, action);
+        clientSync.SendAction(this, "spell");
     }
 
     IEntity IAutoCreateServerEntity.createEntity()

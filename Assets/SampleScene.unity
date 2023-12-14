@@ -600,6 +600,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   server: {fileID: 222868645}
+  minFakeLag: 0.05
+  maxFakeLag: 0.21
 --- !u!4 &873317414
 Transform:
   m_ObjectHideFlags: 0
@@ -757,5 +759,5 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 873317414}
   - {fileID: 222868646}
+  - {fileID: 873317414}

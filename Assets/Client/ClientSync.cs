@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,8 @@ public class ClientSync : MonoBehaviour {
     public event OnSyncDelegate onSync;
 
     [SerializeField] private Server server;
+    [SerializeField] private float minFakeLag = 0;
+    [SerializeField] private float maxFakeLag = 0;
 
     private List<ISyncEntity> syncEntities = new List<ISyncEntity>();
 
@@ -15,7 +18,7 @@ public class ClientSync : MonoBehaviour {
         if (existingData != null) {
             syncEntity.ReceiveSync(step, existingData);
         }
-        
+
         if (syncEntity is IAutoCreateServerEntity) {
             var createdEntity = (syncEntity as IAutoCreateServerEntity).createEntity();
             server.entityManager.AddEntity(syncEntity.name, createdEntity);
@@ -27,8 +30,15 @@ public class ClientSync : MonoBehaviour {
     }
 
     public void SendAction(ISyncEntity from, string action) {
-        server.ReceiveAction(from.name, action);
+        StartCoroutine(sendDelayed(from.name, action));
     }
+
+    IEnumerator sendDelayed(string fromName, string action) {
+        var lag = Random.Range(minFakeLag, maxFakeLag);
+        yield return new WaitForSecondsRealtime(lag);
+        server.ReceiveAction(fromName, action);
+    }
+
 
     public GameState gameState { get; private set; }
     public int step { get; private set; }
