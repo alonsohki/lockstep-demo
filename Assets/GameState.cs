@@ -6,8 +6,8 @@ public class GameState {
     private static class Factory {
         private delegate IState Builder();
         private static Dictionary<string, Builder> builders = new Dictionary<string, Builder>() {
-            { "PlayerState", () => { return new PlayerState(); } },
-            { "SpellState", () => { return new SpellState(); } },
+            { "PlayerState", () => new PlayerState() },
+            { "SpellState", () => new SpellState() },
         };
 
         public static IState build(string type) {

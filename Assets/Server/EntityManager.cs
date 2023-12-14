@@ -53,7 +53,7 @@ public class EntityManager {
     }
 
     public IEntity FindEntity(string name) {
-        return entities.Find(delegate (Entity entity) { return entity.name == name; })?.data;
+        return entities.Find(entity => entity.name == name)?.data;
     }
 
     public void Update(Dictionary<IActionable, string> pendingActions, int step) {
@@ -62,9 +62,7 @@ public class EntityManager {
         }
 
         var stepUpdatesCopy = new List<IStepUpdate>(stepUpdates);
-        stepUpdatesCopy.ForEach(delegate (IStepUpdate stepUpdate) {
-            stepUpdate.Update(step);
-        });
+        stepUpdatesCopy.ForEach(stepUpdate => stepUpdate.Update(step));
     }
 
     public Dictionary<string, GameState.SerializedEntry> GetGameState() {

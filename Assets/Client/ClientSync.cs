@@ -51,7 +51,7 @@ public class ClientSync : MonoBehaviour {
         this.step = step;
         gameState = GameState.deserialize(data);
 
-        syncEntities.ForEach(delegate (ISyncEntity receiver) {
+        syncEntities.ForEach(receiver => {
             var state = gameState.Find(receiver.name);
             if (state != null) {
                 receiver.ReceiveSync(step, state);
