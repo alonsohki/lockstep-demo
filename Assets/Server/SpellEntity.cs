@@ -20,11 +20,12 @@ public class SpellEntity : IEntity, IStateful, IStepUpdate
     }
 
     void IStepUpdate.Update(int step) {
-        if (step == state.endStep && ((state.toPlayer as IStateful).state as PlayerState).action != "dodge") {
-            state.toPlayer.Damage(50);
-        }
-
         if (step > state.endStep) {
+            var toPlayer = state.toPlayer;
+            var toPlayerState = (toPlayer as IStateful).state as PlayerState;
+            if (toPlayerState.action != "dodge") {
+                toPlayer.Damage(50);
+            }
             entityManager.RemoveEntity(this);
         }
     }

@@ -58,7 +58,7 @@ public class EntityManager {
 
     public void Update(Dictionary<IActionable, string> pendingActions, int step) {
         foreach (var pair in pendingActions) {
-            pair.Key.ProcessAction(pair.Value);
+            pair.Key.ProcessAction(step, pair.Value);
         }
 
         var stepUpdatesCopy = new List<IStepUpdate>(stepUpdates);

@@ -18,19 +18,18 @@ public class PlayerEntity : IEntity, IStateful, IActionable, IStepUpdate
     }
 
     private int goToIdleOnStep = int.MaxValue;
-    private int lastStep = 0;
 
-    void IActionable.ProcessAction(string action)
+    void IActionable.ProcessAction(int step, string action)
     {
         if (action == "dodge") {
             state.action = "dodge";
-            goToIdleOnStep = lastStep + 2;
+            goToIdleOnStep = step + 2;
         }
         else if (action == "spell") {
             var currentSpell = entityManager.FindEntity("spell_towards_" + enemy);
             if (currentSpell == null) {
                 var enemyEntity = entityManager.FindEntity(enemy) as PlayerEntity;
-                var spell = new SpellEntity(this, enemyEntity, lastStep + 1, lastStep + 5);
+                var spell = new SpellEntity(this, enemyEntity, step, step + 5);
                 entityManager.AddEntity("spell_towards_" + enemy, spell);
             }
         }
@@ -41,7 +40,6 @@ public class PlayerEntity : IEntity, IStateful, IActionable, IStepUpdate
             goToIdleOnStep = int.MaxValue;
             state.action = "idle";
         }
-        lastStep = step;
     }
 
     public void Damage(int hp) {

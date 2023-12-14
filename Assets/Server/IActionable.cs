@@ -1,3 +1,3 @@
 public interface IActionable {
-    void ProcessAction(string action);
+    void ProcessAction(int step, string action);
 }
