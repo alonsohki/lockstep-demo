@@ -1,12 +1,11 @@
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerView : MonoBehaviour, ISyncEntity
+public class PlayerView : MonoBehaviour, ISyncEntity, IAutoCreateServerEntity
 {
-    [SerializeField] private Server server;
+    [SerializeField] private ClientSync clientSync;
     [SerializeField] private string entityName;
     [SerializeField] private string enemyName;
     [SerializeField] private int position;
@@ -21,25 +20,16 @@ public class PlayerView : MonoBehaviour, ISyncEntity
     [SerializeField] private float minFakeLag = 0;
     [SerializeField] private float maxFakeLag = 0;
 
-    private ISyncEntity.SendSyncDelegate sendSync;
-
-
     string ISyncEntity.name => entityName;
 
-    void ISyncEntity.SetupSync(ISyncEntity.SendSyncDelegate sendSync)
+    void ISyncEntity.ReceiveSync(int step, IState state_)
     {
-        this.sendSync = sendSync;
-    }
+        var state = state_ as PlayerState;
 
-    void ISyncEntity.ReceiveSync(int step, Dictionary<string, object> state)
-    {
-        var action = state["action"].ToString();
-        var hp = state["hp"].ToString();
+        hp.text = state.hp.ToString();
+        action.text = state.action;
 
-        this.hp.text = hp;
-        this.action.text = action;
-
-        if (action == "dodge") {
+        if (state.action == "dodge") {
             box.anchoredPosition = new Vector2(0, 200);
         }
         else {
@@ -50,10 +40,7 @@ public class PlayerView : MonoBehaviour, ISyncEntity
     void Start() {
         dodge.onClick.AddListener(OnDodge);
         spell.onClick.AddListener(OnSpell);
-
-        var playerEntity = new PlayerEntity(enemyName, position);
-        server.entityManager.AddEntity(entityName, playerEntity);
-        server.AddSyncEntity(this, playerEntity);
+        clientSync.AddSyncEntity(this);
     }
 
     private void OnDodge() {
@@ -67,6 +54,11 @@ public class PlayerView : MonoBehaviour, ISyncEntity
     IEnumerator sendDelayed(string action) {
         var lag = Random.Range(minFakeLag, maxFakeLag);
         yield return new WaitForSecondsRealtime(lag);
-        sendSync(action);
+        clientSync.SendAction(this, action);
+    }
+
+    IEntity IAutoCreateServerEntity.createEntity()
+    {
+        return new PlayerEntity(enemyName, position);
     }
 }

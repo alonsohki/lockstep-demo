@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 public class EntityManager {
     private class Entity {
@@ -65,13 +67,16 @@ public class EntityManager {
         });
     }
 
-    public Dictionary<string, Dictionary<string, object>> GetGameState() {
-        Dictionary<string, Dictionary<string, object>> gameState = new Dictionary<string, Dictionary<string, object>>();
-        stateful.ForEach(delegate(Entity entity) {
-            var state = new Dictionary<string, object>();
-            (entity.data as IStateful).WriteState(state);
-            gameState.Add(entity.name, state);
-        });
-        return gameState;
+    public Dictionary<string, GameState.SerializedEntry> GetGameState() {
+        var serializableEntities =
+            from entity in stateful
+            let statefulEntity = entity.data as IStateful
+            where statefulEntity != null
+            select new GameState.SerializableEntity {
+                name = entity.name,
+                state = statefulEntity.state,
+            }
+        ;
+        return GameState.serialize(serializableEntities);
     }
 }

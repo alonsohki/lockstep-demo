@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 public class PlayerEntity : IEntity, IStateful, IActionable, IStepUpdate
 {
     private EntityManager entityManager;
@@ -12,19 +10,11 @@ public class PlayerEntity : IEntity, IStateful, IActionable, IStepUpdate
         this.position = position;
     }
 
-    public PlayerState state { get; private set; } = new PlayerState(100, "idle");
+    private PlayerState state = new PlayerState(100, "idle");
+    IState IStateful.state => state;
 
     void IEntity.Setup(EntityManager manager) {
         entityManager = manager;
-    }
-
-    void IStateful.WriteState(Dictionary<string, object> state) {
-        state.Add("action", this.state.action);
-        state.Add("hp", this.state.hp);
-    }
-
-    void IStateful.ReadState(Dictionary<string, object> state) {
-        this.state = new PlayerState((int)state["hp"], (string)state["action"]);
     }
 
     private int goToIdleOnStep = int.MaxValue;
