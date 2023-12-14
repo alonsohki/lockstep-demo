@@ -48,18 +48,27 @@ public class ClientSync : MonoBehaviour {
     }
 
     private void OnSync(int step, Dictionary<string, GameState.SerializedEntry> data) {
-        this.step = step;
-        gameState = GameState.deserialize(data);
+        StartCoroutine(syncDelayed(step, GameState.deserialize(data)));
+    }
 
-        syncEntities.ForEach(receiver => {
-            var state = gameState.Find(receiver.name);
-            if (state != null) {
-                receiver.ReceiveSync(step, state);
+    IEnumerator syncDelayed(int step, GameState gameState) {
+        var lag = Random.Range(minFakeLag, maxFakeLag);
+        yield return new WaitForSecondsRealtime(lag);
+
+        if (step > this.step) {
+            this.step = step;
+            this.gameState = gameState;
+
+            syncEntities.ForEach(receiver => {
+                var state = gameState.Find(receiver.name);
+                if (state != null) {
+                    receiver.ReceiveSync(step, state);
+                }
+            });
+
+            if (onSync != null) {
+                onSync(step, gameState);
             }
-        });
-
-        if (onSync != null) {
-            onSync(step, gameState);
         }
     }
 }

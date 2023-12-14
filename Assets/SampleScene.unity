@@ -600,8 +600,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   server: {fileID: 222868645}
-  minFakeLag: 0.05
-  maxFakeLag: 0.21
+  minFakeLag: 0.02
+  maxFakeLag: 0.15
 --- !u!4 &873317414
 Transform:
   m_ObjectHideFlags: 0
