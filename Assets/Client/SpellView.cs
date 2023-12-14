@@ -1,8 +1,10 @@
+using System;
 using UnityEngine;
 
 public class SpellView : MonoBehaviour, ISyncEntity
 {
-    [SerializeField] private RectTransform rectTransform;
+    [SerializeField] private RectTransform interpolatedTransform;
+    [SerializeField] private RectTransform fixedTransform;
 
     public string spellName;
     private bool hasData = false;
@@ -21,13 +23,19 @@ public class SpellView : MonoBehaviour, ISyncEntity
         startTime = state.startStep * Time.fixedDeltaTime;
         targetTime = state.endStep * Time.fixedDeltaTime;
         hasData = true;
+
+        // Fixed
+        float delta = 1f - (state.endStep - step) / (float)(state.endStep - state.startStep);
+        float pos = state.fromPlayer.position + (state.toPlayer.position - state.fromPlayer.position) * Math.Clamp(delta, 0, 1);
+        fixedTransform.localPosition = new Vector3(pos, 0, 0);
     }
 
     void Update() {
         if (hasData) {
-            float delta = (Time.time - startTime) / (targetTime - startTime);
-            float pos = startPosition + (targetPosition - startPosition) * delta;
-            rectTransform.localPosition = new Vector3(pos, 0, 0);
+            // Interpolated
+            float delta = (Time.time - startTime - Time.fixedDeltaTime) / (targetTime - startTime);
+            float pos = startPosition + (targetPosition - startPosition) * Math.Clamp(delta, 0, 1);
+            interpolatedTransform.localPosition = new Vector3(pos, 0, 0);
         }
     }
 }
